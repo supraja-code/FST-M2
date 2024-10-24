@@ -1,0 +1,18 @@
+-- Drop tables
+drop table save_dialogue;
+drop table save_Count;
+
+-- Create a table to store results
+CREATE TABLE save_dialogue (Actor STRING, Dialogues STRING) 
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
+
+-- Loading data into table
+LOAD DATA LOCAL INPATH '/root/BigData_Project/inputs/episodeIV_dialogues.txt' INTO TABLE save_dialogue;
+
+CREATE TABLE save_Count AS
+SELECT COUNT(*) AS luke_lines
+FROM save_dialogue
+WHERE Dialogues LIKE '%Luke%';
+
+-- Display the results
+INSERT OVERWRITE DIRECTORY 'hdfs:///user/supraja/hive_project_results' ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' SELECT * FROM save_Count;

@@ -1,0 +1,24 @@
+-- Drop the tables
+DROP TABLE Dialogue;
+DROP TABLE Dialogue_count;
+
+-- Create a table to store results
+CREATE TABLE Dialogue (Actor STRING, Dialogue STRING)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
+
+-- Loading data into files table
+LOAD DATA LOCAL INPATH '/root/BigData_Project/inputs/episodeIV_dialogues.txt' INTO TABLE dialogue;
+LOAD DATA LOCAL INPATH '/root/BigData_Project/inputs/episodeVI_dialogues.txt' INTO TABLE dialogue;
+LOAD DATA LOCAL INPATH '/root/BigData_Project/inputs/episodeV_dialogues.txt' INTO TABLE dialogue;
+
+-- 
+CREATE TABLE Dialogue_count AS 
+SELECT Actor,No_Of_Dialogues FROM
+(SELECT Actor,COUNT(1) as No_Of_Dialogues FROM 
+dialogue GROUP BY Actor)w 
+ORDER by No_Of_Dialogues DESC;
+
+-- Display the results
+INSERT OVERWRITE DIRECTORY 'hdfs:///user/supraja/hive_project_results'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' 
+SELECT * FROM Dialogue_count;
